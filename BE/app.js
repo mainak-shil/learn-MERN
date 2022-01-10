@@ -1,11 +1,18 @@
-const fs = require("fs");
+const express = require("express");
 
-const userName = "Mainak";
+const app = express();
 
-fs.writeFile("user-data.txt", "Name: " + userName, (err) => {
-  if (err) {
-    console.log(err);
-    return;
-  }
-  console.log("WRITE FILE");
+// middleware // alter any request
+// use next() for jump to next middleware
+
+// bodyparser use to parse the data and auto next to next middleware
+app.use((req, res, next) => {
+  console.log("MIDDLEWARE");
+  next();
 });
+
+app.use((req, res, next) => {
+  re.send();
+});
+
+app.listen(3000);
