@@ -1,18 +1,11 @@
 const express = require("express");
+const bodyParser = require("body-parser");
+
+const placesRoutes = require("./routes/places-routes");
 
 const app = express();
 
-// middleware // alter any request
-// use next() for jump to next middleware
-
-// bodyparser use to parse the data and auto next to next middleware
-app.use((req, res, next) => {
-  console.log("MIDDLEWARE");
-  next();
-});
-
-app.use((req, res, next) => {
-  re.send();
-});
+// connect routes
+app.use("/api/places", placesRoutes); // prepended - /api/places/...
 
 app.listen(3000);
