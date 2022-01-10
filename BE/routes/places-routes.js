@@ -33,13 +33,25 @@ router.get("/:pid", (req, res, next) => {
   // 1st params to filter req
   const placeId = req.params.pid; // {pid: 'p1}
   const place = DUMMY_PLACES.find((p) => p.id === placeId);
+  if (!place) {
+    // error handling
+    return res
+      .status(404)
+      .json({ message: "Could not find a place for the given id." }); // default 200, not found 400
+  }
   res.json({ place });
 });
 
 // get list of all places for a given user id (uid)
 router.get("/user/:uid", (req, res, next) => {
   const userId = req.params.uid;
-  const place = DUMMY_place.find((p) => p.creator === userId);
+  const place = DUMMY_PLACES.find((p) => p.creator === userId);
+  if (!place) {
+    // error handling
+    return res
+      .status(404)
+      .json({ message: "Could not find a place for the given user id." }); // default 200, not found 400
+  }
   res.json({ place });
 });
 
