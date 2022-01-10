@@ -1,5 +1,7 @@
 const express = require("express");
 
+const HttpError = require("../models/http-error");
+
 const router = express.Router();
 // order of routes matters
 
@@ -35,10 +37,9 @@ router.get("/:pid", (req, res, next) => {
   const place = DUMMY_PLACES.find((p) => p.id === placeId);
   if (!place) {
     // error handling
-    // throw
-    const error = new Error("Could not find a place with that id");
-    error.code = 404;
-    throw error;
+    // throw or next()
+    // next for async programing
+    throw new HttpError("Could not find a place with that id", 404);
   }
   res.json({ place });
 });
@@ -49,9 +50,7 @@ router.get("/user/:uid", (req, res, next) => {
   const place = DUMMY_PLACES.find((p) => p.creator === userId);
   if (!place) {
     // error handling
-    const error = new Error("Could not find a place with that user id");
-    error.code = 404;
-    return next(error); // next for async programing
+    return next(new HttpError("Could not find a place with that user id", 404));
   }
   res.json({ place });
 });
