@@ -1,58 +1,36 @@
 const express = require("express");
-
-const HttpError = require("../models/http-error");
+const { check } = require("express-validator");
+const placesControllers = require("../controller/places-controller");
 
 const router = express.Router();
 // order of routes matters
 
-const DUMMY_PLACES = [
-  {
-    id: "p1",
-    title: "Empire State Building",
-    description: "One of the most famous sky scrapers in the world!",
-    location: {
-      lat: 40.7484474,
-      lng: -73.9871516,
-    },
-    address: "20 W 34th St, New York, NY 10001",
-    creator: "u1",
-  },
-  {
-    id: "p2",
-    title: "Empire State Building",
-    description: "One of the most famous sky scrapers in the world!",
-    location: {
-      lat: 40.7484474,
-      lng: -73.9871516,
-    },
-    address: "20 W 34th St, New York, NY 10001",
-    creator: "u1",
-  },
-];
+router.get("/", placesControllers.getAllPlaces);
 
 // get only place using pid
-router.get("/:pid", (req, res, next) => {
-  // 1st params to filter req
-  const placeId = req.params.pid; // {pid: 'p1}
-  const place = DUMMY_PLACES.find((p) => p.id === placeId);
-  if (!place) {
-    // error handling
-    // throw or next()
-    // next for async programing
-    throw new HttpError("Could not find a place with that id", 404);
-  }
-  res.json({ place });
-});
+router.get("/:pid", placesControllers.getPlaceById);
 
 // get list of all places for a given user id (uid)
-router.get("/user/:uid", (req, res, next) => {
-  const userId = req.params.uid;
-  const place = DUMMY_PLACES.find((p) => p.creator === userId);
-  if (!place) {
-    // error handling
-    return next(new HttpError("Could not find a place with that user id", 404));
-  }
-  res.json({ place });
-});
+router.get("/user/:uid", placesControllers.getPlacesByUserId);
+
+// post //! need validation
+router.post(
+  "/",
+  [
+    check("title").not().isEmpty(),
+    check("description").isLength({ min: 5 }),
+    check("address").not().isEmpty(),
+  ],
+  placesControllers.createPlace
+);
+
+// update place using pid //! need validation
+router.patch(
+  "/:pid",
+  [check("title").not().isEmpty(), check("description").isLength({ min: 5 })],
+  placesControllers.updatePlaceById
+);
+
+router.delete("/:pid", placesControllers.deletePlace);
 
 module.exports = router;
