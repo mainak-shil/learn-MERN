@@ -1,0 +1,46 @@
+throw new Error
+
+or
+
+next(new Error)
+
+===>> while doing async processing need todo next() as throw will return 
+
+mongodb 
+==============
+install mongodb
+
+login mongodb atlas - cloud storage
+mainak77cool
+1. create a cluster -free
+mainak Nc5xNGU4GG5N4Hy7
+
+add ip whitelist in Network Access
+
+2. connect db get the url
+url need to dynamic with username password of db and replace test -> <new db_name>
+//<username>:<password>@<clusterName>.../<dbname>
+mongodb+srv://mainak:Nc5xNGU4GG5N4Hy7@cluster0.oixkfgt.mongodb.net/places?retryWrites=true&w=majority
+
+and Mongoose
+==============
+
+install mongoose
+- interactive api with mongodb and node
+- storing and maintaining database
+- useful helper fns
+
+_id vs id
+- _id is mongodb objectID which can be converted to string by mongoose to interact
+
+convert mongo object to simple js object, _id to id while fetching any data
+<item>.toObject({ getters: true })
+-> this gives id with _id also
+
+
+
+
+
+ALWAYS USE FOR: 
+
+error handling: next(new HttpError("Could not find a place with that id", 404));
