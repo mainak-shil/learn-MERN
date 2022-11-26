@@ -10,6 +10,19 @@ const app = express();
 
 app.use(bodyParser.json());
 
+app.use((req, res, next) => {
+  //! CORS handling
+  //! idea: add some headers in response; later when we sent back specific routes
+  //! does have these headers attached
+  res.setHeader("Access-Control-Allow-Origin", "*"); //! allows which domain should allow
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  );
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE*");
+  next();
+});
+
 // connect routes
 app.use("/api/places", placesRoutes); // prepended - /api/places/...
 
