@@ -68,20 +68,26 @@ const getPlaceById = async (req, res, next) => {
 const getPlacesByUserId = async (req, res, next) => {
   const userId = req.params.uid;
   console.log("userId", userId);
-  let places;
+  let places, userWithPlaces;
   try {
-    places = await Place.find({ creator: userId });
+    // places = await Place.find({ creator: userId });
+    //! or by populate; get access to places which is a relation
+    userWithPlaces = await User.findById(userId).populate("places");
   } catch (error) {
     return next(new HttpError("fetching place failed", 500));
   }
   //!old
   //const places = DUMMY_PLACES.filter((p) => p.creator === userId);
-  if (!places || places.length === 0) {
+  // if (!places || places.length === 0) {
+  if (!userWithPlaces || userWithPlaces.places.length === 0) {
     //! error handling, err middleware
     return next(new HttpError("Could not find a place with that user id", 404));
   }
   res.json({
-    places: places.map((place) => place.toObject({ getters: true })),
+    // places: places.map((place) => place.toObject({ getters: true })),
+    places: userWithPlaces.places.map((place) =>
+      place.toObject({ getters: true })
+    ),
   });
 };
 
@@ -196,7 +202,7 @@ const deletePlace = async (req, res, next) => {
   const placeId = req.params.pid;
   let place;
   try {
-    place = await Place.findById(placeId);
+    place = await Place.findById(placeId).populate("creator");
   } catch (error) {
     return next(new HttpError("Could not find a place with that id", 500));
   }
@@ -204,8 +210,20 @@ const deletePlace = async (req, res, next) => {
   // if (!DUMMY_PLACES.find((p) => p.id === placeId)) {
   //   throw new HttpError("Could not find place for that id.", 404);
   // }
+  if (!place) {
+    return next(new HttpError("Could not find place for this id", 404));
+  }
   try {
-    await place.remove();
+    //! delete place ; remove place from user
+    //! populate
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    await place.remove({ session }); // ask; this should be done last????
+    //! remove the place from user places []
+    place.creator.places.pull(place);
+    //! save the changes in relation doc
+    await place.creator.save({ session });
+    await session.commitTransaction();
   } catch (error) {
     return next(new HttpError("Could not delete the place", 500));
   }
