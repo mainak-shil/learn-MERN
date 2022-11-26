@@ -35,12 +35,46 @@ _id vs id
 
 convert mongo object to simple js object, _id to id while fetching any data
 <item>.toObject({ getters: true })
--> this gives id with _id also
+-> works only with object
+{ getters: true } -> converts _id to id
+
+
+find() -> all the docs
+--available to both mongodb and Mongoose
+- mongodb: returns a curser to iterate
+- Mongoose: returns a curser and array
+
+Relation between entities [users vs places]
+place = {
+  ...
+  creator: { type: mongoose.Types.ObjectId, require: true, ref: "User" },
+}
+
+1:many
+user = {
+  ...
+ places: [{ type: mongoose.Types.ObjectId, require: true, ref: "Place" }],
+}
 
 
 
+email: { type: "string", require: true, unique: true},
+unique -> query faster if req email
 
+response filter 
+User.find({}, "-password"); {...<except password>}
+User.find({}, "email name"); {email,name}
 
-ALWAYS USE FOR: 
+transitions ; sessions
+-> these operation need the table, else error
+-> mongoose push -> establish conn between models
+
+ALWAYS USE: 
 
 error handling: next(new HttpError("Could not find a place with that id", 404));
+throw vs return next() -> throw doesn't execute next blocks in async tasks
+
+
+TO read
+- all methods  mainly CRUD for mongodb and mongoose
+- mongoose-unique-validator
