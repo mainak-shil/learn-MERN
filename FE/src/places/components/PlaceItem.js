@@ -32,7 +32,7 @@ const PlaceItem = (props) => {
     setShowConfirmModal(false);
     try {
       await sendRequest(
-        `http://localhost:5000/api/places/${props.id}`,
+        `http://localhost:5001/api/places/${props.id}`,
         "DELETE"
       );
       props.onDelete(props.id);
@@ -79,7 +79,10 @@ const PlaceItem = (props) => {
         <Card className='place-item__content'>
           {isLoading && <LoadingSpinner asOverlay />}
           <div className='place-item__image'>
-            <img src={props.image} alt={props.title} />
+            <img
+              src={`http://localhost:5001/${props.image}`}
+              alt={props.title}
+            />
           </div>
           <div className='place-item__info'>
             <h2>{props.title}</h2>

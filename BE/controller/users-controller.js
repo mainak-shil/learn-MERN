@@ -55,10 +55,12 @@ const signup = async (req, res, next) => {
     name,
     email,
     password,
-    image:
-      "https://thumbs.dreamstime.com/b/ten-cats-row-many-cats-sitting-row-front-white-background-128832657.jpg",
+    image: req.file.path,
+    // image:
+    //   "https://thumbs.dreamstime.com/b/ten-cats-row-many-cats-sitting-row-front-white-background-128832657.jpg",
     places: [],
   });
+  console.log("createdUser", createdUser);
   // const createdUser = {
   //   id: uuidv4(),
   //   name,
@@ -93,7 +95,10 @@ const login = async (req, res, next) => {
   // if (!identifiedUser || identifiedUser.password !== password) {
   //   throw new HttpError("User not found/invalid password", 401);
   // }
-  res.status(200).json({ message: "Logged in" });
+  res.status(200).json({
+    message: "Logged in",
+    user: existingUser.toObject({ getters: true }),
+  });
 };
 
 exports.getUsers = getUsers;

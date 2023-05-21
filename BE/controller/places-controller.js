@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const HttpError = require("../models/http-error");
+const fs = require("fs");
 
 const { v4: uuidv4 } = require("uuid"); //has timestamp
 const { validationResult } = require("express-validator");
@@ -113,16 +114,20 @@ const createPlace = async (req, res, next) => {
     description,
     location: coordinates,
     address,
-    image:
-      "https://thumbs.dreamstime.com/b/ten-cats-row-many-cats-sitting-row-front-white-background-128832657.jpg",
+    image: req.file.path,
+    // image:
+    //   "https://thumbs.dreamstime.com/b/ten-cats-row-many-cats-sitting-row-front-white-background-128832657.jpg",
     creator, //!logged in user id
   });
+
+  console.log(creator);
 
   let user;
   try {
     //!check if the logged in userId exists
     user = await User.findById(creator);
   } catch (error) {
+    console.log("error", error);
     return next(new HttpError("Creating place failed", 500));
   }
 
@@ -202,6 +207,7 @@ const deletePlace = async (req, res, next) => {
   const placeId = req.params.pid;
   let place;
   try {
+    //@ we use populate to get relation data for that document(row)
     place = await Place.findById(placeId).populate("creator");
   } catch (error) {
     return next(new HttpError("Could not find a place with that id", 500));
@@ -213,20 +219,30 @@ const deletePlace = async (req, res, next) => {
   if (!place) {
     return next(new HttpError("Could not find place for this id", 404));
   }
+
+  const imagePath = place.image;
+
   try {
     //! delete place ; remove place from user
     //! populate
     const session = await mongoose.startSession();
     session.startTransaction();
-    await place.remove({ session }); // ask; this should be done last????
+    await place.remove({ session }); //delete 1 - place document // ask; this should be done last????
     //! remove the place from user places []
     place.creator.places.pull(place);
     //! save the changes in relation doc
     await place.creator.save({ session });
     await session.commitTransaction();
+
+    // db.places.deleteOne( { id: place.id } )
+    // db.users.deleteOne( { id: place.creator.id } )
   } catch (error) {
     return next(new HttpError("Could not delete the place", 500));
   }
+  fs.unlink(imagePath, (err) => {
+    console.log(err);
+  });
+
   //!old
   // DUMMY_PLACES = DUMMY_PLACES.filter((e) => e.id !== placeId);
   res.status(200).json({ message: "Deleted place" });

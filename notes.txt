@@ -69,10 +69,29 @@ transitions ; sessions
 -> these operation need the table, else error
 -> mongoose push -> establish conn between models
 
-ALWAYS USE: 
+populate() - get access to a object's relation object
 
+CORS - cross-origin resource sharing
+- resources on a server can only be requested from save server
+- browser error
+- fix by attach header
+- BE will know ok you can use it
+
+
+
+ALWAYS USE:
+
+In BE:::::
 error handling: next(new HttpError("Could not find a place with that id", 404));
 throw vs return next() -> throw doesn't execute next blocks in async tasks
+*** bodyparser in FE works in POST only if we pass content type json in headers ***
+working with transactions; need to have the collection in db
+
+In FE:::::
+useCallback -> doesn't recreate when fn re-renders
+useHistory.push('/) / replace()
+
+cancel ongoing network calls, where component is not present; in cleanup fn of hooks
 
 
 TO read
